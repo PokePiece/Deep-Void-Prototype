@@ -1,9 +1,23 @@
-
-
 from typing import List, Dict
 import uuid
+import json
+import os
+
+KNOWLEDGE_FILE = "knowledge.json"
 
 knowledge: List[Dict] = []
+
+def load_knowledge():
+    global knowledge
+    if os.path.exists(KNOWLEDGE_FILE):
+        with open(KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
+            knowledge = json.load(f)
+    else:
+        knowledge = []
+
+def save_knowledge():
+    with open(KNOWLEDGE_FILE, "w", encoding="utf-8") as f:
+        json.dump(knowledge, f, indent=2)
 
 def add_knowledge(text: str, category: str = "general", tags: List[str] = None):
     node = {
@@ -13,34 +27,44 @@ def add_knowledge(text: str, category: str = "general", tags: List[str] = None):
         "tags": tags or []
     }
     knowledge.append(node)
+    save_knowledge()
 
 def get_knowledge(category: str = None, tag: str = None) -> List[Dict]:
     results = knowledge
     if category:
-        results = [m for m in results if m["category"] == category]
+        results = [m for m in results if m.get("category") == category]
     if tag:
-        results = [m for m in results if tag in m["tags"]]
+        results = [m for m in results if tag in m.get("tags", [])]
     return results
 
 def clear_knowledge():
+    global knowledge
     knowledge.clear()
+    save_knowledge()
+    
+def update_knowledge(node_id: str, text: str = None, category: str = None, tags: List[str] = None) -> bool:
+    """
+    Update a knowledge node by its id.
+    Returns True if updated, False if not found.
+    """
+    for node in knowledge:
+        if node["id"] == node_id:
+            if text is not None:
+                node["text"] = text
+            if category is not None:
+                node["category"] = category
+            if tags is not None:
+                node["tags"] = tags
+            save_knowledge()
+            return True
+    return False
+
+#add failsafe where when add_ or save_knowledge is called when the array is 
+#empty, to abort the function early (since load_knowledge() must not have been called)
+#best to add this in save_knowledge since it's the final relevant function call
+
+load_knowledge()
+
+save_knowledge()
 
 
-# Initial core memories
-add_knowledge(
-    "Developer is developing a neuronic intelligence interface known as the Webtrix. Structured as a type of Metaverse, the app is a 3D embodiment of the real world mapped onto a virtual domain to embody the web in a physical presence, grounding intelligence in reality.",
-    category="project",
-    tags=["webtrix", "metaverse", "neuronic"]
-)
-
-add_knowledge(
-    "The Developer has a cloud intelligence superstructure known as the Void that allows for the crystallized pool of intelligence to be accessed anywhere on the globe. He also has an embedded AGI system made to mimic human consciousness and productivity at all levels structured in C++, C, and meta-languages to enable superior control.",
-    category="infrastructure",
-    tags=["void", "AGI", "embedded"]
-)
-
-add_knowledge(
-    "Seek to identify new industry trends and emerging technologies in the world of tech. Especially target neurotechnology as it relates to AI and intelligence, cloud and embedded AI systems, and more. Analyze existing knowledge for new ideas along with potential paths of improvement.",
-    category="strategy",
-    tags=["neurotech", "trend", "innovation"]
-)

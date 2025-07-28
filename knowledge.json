@@ -1,0 +1,144 @@
+[
+  {
+    "id": "03965055-f076-4153-a8c5-44fb5d05c739",
+    "text": "Developer is developing a neuronic intelligence interface known as the Webtrix. Structured as a type of Metaverse, the app is a 3D embodiment of the real world mapped onto a virtual domain to embody the web in a physical presence, grounding intelligence in reality.",
+    "category": "project",
+    "tags": [
+      "webtrix",
+      "metaverse",
+      "neuronic"
+    ]
+  },
+  {
+    "id": "d4819cc1-a6d6-43f3-924a-2f5644fd0fa1",
+    "text": "The Developer has a cloud intelligence superstructure known as the Void that allows for the crystallized pool of intelligence to be accessed anywhere on the globe. He also has an embedded AGI system made to mimic human consciousness and productivity at all levels structured in C++, C, and meta-languages to enable superior control.",
+    "category": "infrastructure",
+    "tags": [
+      "void",
+      "AGI",
+      "embedded"
+    ]
+  },
+  {
+    "id": "2dff4249-d210-4a26-b20c-ea29c184067d",
+    "text": "Seek to identify new industry trends and emerging technologies in the world of tech. Especially target neurotechnology as it relates to AI and intelligence, cloud and embedded AI systems, and more. Analyze existing knowledge for new ideas along with potential paths of improvement.",
+    "category": "strategy",
+    "tags": [
+      "neurotech",
+      "trend",
+      "innovation"
+    ]
+  },
+  {
+    "id": "5339ef60-3151-4d58-8db9-7595b07da381",
+    "text": "I don't always drink Sprite. But when I do, I drink cranberry.",
+    "category": "general",
+    "tags": []
+  },
+  {
+    "id": "edab24ca-0f79-4ef2-beba-0adc3fbc95f7",
+    "text": "Developer is developing a modular AI runtime system called Deep Void, designed for continuous intelligent execution and knowledge evolution.",
+    "category": "project",
+    "tags": [
+      "deepvoid",
+      "ai",
+      "runtime"
+    ]
+  },
+  {
+    "id": "b9c3fdbc-c923-4ea8-80bd-38f03efdbbb5",
+    "text": "Developer is constructing a 3D browser-based intelligence interface named Webtrix, which integrates spatial web nodes with avatar-based interaction.",
+    "category": "project",
+    "tags": [
+      "webtrix",
+      "3d",
+      "interface",
+      "avatar"
+    ]
+  },
+  {
+    "id": "c292dde6-7978-42d7-9788-4c969a78acdb",
+    "text": "Developer prefers concise, direct, and technically accurate responses from assistants, avoiding conversational fluff or redundant context.",
+    "category": "preference",
+    "tags": [
+      "communication",
+      "directness"
+    ]
+  },
+  {
+    "id": "bb71797f-f0cb-4cda-92e9-131fff721738",
+    "text": "Developer is integrating Supabase and Chroma for hybrid remote/local memory storage in intelligent agent systems.",
+    "category": "architecture",
+    "tags": [
+      "supabase",
+      "chroma",
+      "memory",
+      "agent"
+    ]
+  },
+  {
+    "id": "6c0e199d-e4d4-48ef-b246-8ff44f4f0be0",
+    "text": "Developer is building an embodied simulation framework using @react-three/rapier with physics, avatars, and NPC agents in Three.js.",
+    "category": "project",
+    "tags": [
+      "threejs",
+      "rapier",
+      "avatar",
+      "npc"
+    ]
+  },
+  {
+    "id": "d3e80293-f93d-4f9c-985d-dc8690f049f5",
+    "text": "Developer prioritizes behavior-level overlays, multi-agent reflection, and runtime profile adaptation when modifying LLMs.",
+    "category": "architecture",
+    "tags": [
+      "llm",
+      "overlay",
+      "reflection",
+      "runtime"
+    ]
+  },
+  {
+    "id": "fa9b0d5c-33fd-4243-ae9b-530d689c31fc",
+    "text": "Developer prefers languages like C, Lisp, Prolog, and Julia for low-level control, symbolic reasoning, and high-performance AI tasks.",
+    "category": "preference",
+    "tags": [
+      "language",
+      "c",
+      "lisp",
+      "prolog",
+      "julia"
+    ]
+  },
+  {
+    "id": "2407d492-8b11-4417-91bf-562e94072ade",
+    "text": "Developer is designing a custom AI server hardware system to serve models locally and in the cloud with full control over architecture.",
+    "category": "project",
+    "tags": [
+      "hardware",
+      "ai",
+      "server",
+      "custom"
+    ]
+  },
+  {
+    "id": "b6e77da6-b961-421d-afd2-93e4ddf3f064",
+    "text": "Developer views machine code and hardware-level understanding as essential for bridging the gap between AI software and real-world robotics.",
+    "category": "philosophy",
+    "tags": [
+      "hardware",
+      "machinecode",
+      "robotics"
+    ]
+  },
+  {
+    "id": "4d3d8287-2e81-4d53-9f2a-a49e9b07d9e4",
+    "text": "Developer uses ChatGPT as a personal AI engineering partner under the nickname 'gptie', integrated into custom runtimes.",
+    "category": "meta",
+    "tags": [
+      "gptie",
+      "assistant",
+      "integration"
+    ]
+  }
+]

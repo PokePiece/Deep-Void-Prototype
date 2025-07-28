@@ -25,7 +25,7 @@ import logging
 from supabase import create_client, Client
 from collections import namedtuple
 import time
-from knowledge_base import knowledge  # import the memory list from your new file
+import knowledge_base
 from collections import namedtuple
 
 load_dotenv() 
@@ -38,8 +38,15 @@ app = FastAPI()
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
+knowledge_base.load_knowledge()
+
+knowledge = knowledge_base.knowledge
+
+
 prime_directive='Continuously analyze advancements in artificial intelligence, identify patterns and opportunities relevant to cutting-edge AI development, and generate insights that assist the Developer '
 'in accelerating their design, strategy, and implementation of intelligent systems. Prioritize long-term impact, technical depth, and alignment with the Developer’s personal goals and philosophy '
+
+prototype_prime_directive=''
 
 prime_directive_emb = model.encode(prime_directive, convert_to_tensor=True)
 
@@ -50,7 +57,7 @@ app.add_middleware(
     "https://void.dilloncarey.com",
 ],  
     allow_credentials=True,
-    allow_methods=["*"],  # Allow POST, OPTIONS, etc.
+    allow_methods=["*"], 
     allow_headers=["*"],
     
 )
@@ -60,15 +67,15 @@ KnowledgeNode = namedtuple("SeaSource", ["id", "text"])
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 TOGETHER_API_URL = "https://api.together.ai/v1/chat/completions"
 
-#Begin intellignece loop
-
-print('hello world')
-
 
 #Parse memory for useful knowledge over a certain score based on intent
-def parse_knowledge(intent=None, max_nodes=10):
+def parse_knowledge(intent=None, max_nodes=5):
     # Retrieve knowledge_nodes from knokwledge knowledge_node list
-    nodes = [KnowledgeNode(id=knowl["id"], text=knowl["text"]) for knowl in knowledge]
+    nodes = []
+    for knowl in knowledge:
+        if "id" in knowl and "text" in knowl:
+            nodes.append(KnowledgeNode(id=knowl["id"], text=knowl["text"]))
+
 
     # Optionally filter by intent or limit max_nodes if needed (basic example)
     if intent:
@@ -91,25 +98,32 @@ def synthesize_usefulness(knowledge_text):
     return usefulness
 
 
-#The function that calles the LLM to formulate thought and thinking responses.
-def think(idea, useful_knowledge):
-    purpose = 'You are an intelligent, precise organ. Analyze your systems and optimize them for intelligent output and improving patterns of AI Development in general from a broader Developer standpoint: industry, cognition, and human interfacing. Think about ways to provide impact.'
-    max_tokens = 1000
-
+#The function that calls the LLM to formulate thought and thinking responses.
+#Added tokens and brevity variables which will allow the think function to give long and concise output
+def think(idea, purpose='', useful_knowledge='', tokens:int=1000, brevity:bool=False):
+    subject = purpose or 'You are an intelligent, precise organ. Analyze your systems and optimize them for intelligent output and improving patterns of AI Development in general from a broader Developer standpoint: industry, cognition, and human interfacing. Think about ways to provide impact.'
+    
+    if brevity:
+        print('being concise')
+        concise_message='Give a concise review on the matter limited to a sharp paragraph.'
+    else:
+        concise_message=''
+        
     headers = {
         "Authorization": f"Bearer {TOGETHER_API_KEY}",
         "Content-Type": "application/json"
     }
 
+#Pass prime directive instead of purpose? Or both via concatenation.
     conversation_history = [
-        {"role": "system", "content": purpose},
-        {"role": "user", "content": idea + useful_knowledge}
+        {"role": "system", "content": prime_directive + subject},
+        {"role": "user", "content": idea + useful_knowledge + concise_message}
     ]
 
     data = {
         "model": "meta-llama/Llama-3-70b-chat-hf",
         "messages": conversation_history,
-        "max_tokens": max_tokens,
+        "max_tokens": tokens,
         "temperature": 0.7
     }
 
@@ -127,8 +141,8 @@ def think(idea, useful_knowledge):
 
 #Think about the knowledge that matches both the intent and prime directive.
 #Generate a synthesis of how a knowledge node fits with the prime directive.
-#Then, generate a summary synthesis of how all knowledge notes fit with the prime directive.
-def thought(intent, objective):
+#Then, generate a summary synthesis of how all knowledge nodes fit with the prime directive.
+def thought(intent, objective, tokens:int=1000, brevity:bool=False):
     
     idea = f"{intent.strip()}\n\nObjective:\n{objective.strip()}"
     print(f"\n\n--- THOUGHT: ---\n{idea}\n")
@@ -152,7 +166,7 @@ def thought(intent, objective):
             if usefulness > 0.5:
                 print(f"[DEBUG] Relevant! Generating synthesis for knowledge node ID {knowledge_node.id}")
                 #synethesis is a conclusion
-                synthesis = think(idea + ' Use the following knowledge to guide your argument. ',  knowledge_node.text)
+                synthesis = think(idea + ' Use the following knowledge to guide your argument. ', knowledge_node.text, 350, True)
                 print(f"[DEBUG] Generated synthesis: {synthesis[:80]}...")
 
                 relevant_syntheses.append(synthesis)
@@ -166,21 +180,18 @@ def thought(intent, objective):
     # Now synthesize a session summary (simplified here as concatenation)
     final_knowledge_synthesis = "\n\n".join(relevant_syntheses) if relevant_syntheses else "No useful syntheses found."
     print('[DEBUG] Final knowledge synthesis generated.')
-    thought_result = think(idea + 'Use the following knowledge to guide your argument. ', final_knowledge_synthesis)
+    
+    thought_result = think(idea + 'Use the following knowledge to guide your argument. ', final_knowledge_synthesis, tokens, brevity)
     return thought_result
 
 #Reason over thoughts and return them
 def reason(reasoning_objective):
-    objective = 'An action plan for the Developer to implement neurotechnology into his AI systems.'
+    objective = 'Create AGI with true neuroplasticity for enhanced reasoning in legal domains.'
 
-    pro_reason = thought("Argue in favor of this objective: ", reasoning_objective)
-    con_reason = thought("Argue against this objective: ", reasoning_objective)
-#next step: have an initial proposal agent that generates a course of action that the later voices reflect on,
-#arguing for or against. This will allow for more precise arguments based on a more clear and realized objective.
-#if desired, the iniital course of action agent can use less tokens and generate a more concise response, according
-#with its purpose to provide an immediate crystallized goal to distill focus and maximize efficiency. So,
-#such an approach is probably more aligned with the target. Adjust think and related functions to accept a tokens
-#or brevity parameter depending on the step in the thought/reasoning process.
+    initial_reason = thought("Develop an initial plan or approach via argument to realize this objective: ", reasoning_objective, 500, True)
+    pro_reason = thought("Argue in favor of this plan/approach: ", initial_reason)
+    con_reason = thought("Argue against this plan/approach: ", initial_reason)
+
     arbiter_input = (
         f"OBJECTIVE:\n{reasoning_objective}\n\n"
         f"PRO ARGUMENT:\n{pro_reason}\n\n"
@@ -193,7 +204,48 @@ def reason(reasoning_objective):
 
     return final_reasoning
 
+def chat(message):
+    chat_guide = 'The Developer is chatting with you. Please respond in a technical, helpful, chat-like tone to respond to the prompt.'
+    response = think(message, chat_guide)
+    return response
+
+def action(task):
+    print('performing action')
+    actions = ['reason', 'think', 'thought', 'synthesize_usefulness', 'parse_knowledge', 'chat', 'discussion']
+    task_guide = ('You are now functioning as a task directing agent for the Developer. Given a prompt by the Developer, '
+                  'you need to decide on an action to take based on its type and intent. You are to only reply with the selected action. '
+                  'You are basically categorizing the nature of the prompt so another system can take an action. But really are deciding on '
+                  'an action to take based on the prompt. The actions you can take are "chat", "think", and "reason". The overwhelming majority '
+                  'of the time, assume the user is chatting with you, and select the chat action. Only if the user explicitly commands you to do one '
+                  'of the other two things should you return those options. When giving your response for the action, return only your choice like '
+                  '"chat", "reason", or "think", with nothing else. Again, without further context or unless explicitly prompted by the user in the '
+                  'prompt simply return "chat". Now, the message from the Developer for you to classify is as follows:')
     
+    action_type = think(task, task_guide)
+    print("\nDecision:\n" + action_type + "\n")
+    if 'chat' in action_type.lower():
+        response = chat(task)
+
+    print(response)
+    return response
+
+
+if __name__ == "__main__":
+    while True:
+        user_input = input("Enter a command or prompt (or type 'exit' to quit): ").strip()
+        if user_input.lower() == "exit":
+            print("Exiting...")
+            break
+        if not user_input:
+            continue
+        print(f"\nRunning processes for command or prompt:\n{user_input}\n")
+
+        action(user_input)
+
+
+
+
+'''
 if __name__ == "__main__":
     while True:
         user_input = input("Enter an objective (or type 'exit' to quit): ").strip()
@@ -204,12 +256,12 @@ if __name__ == "__main__":
             continue
         print(f"\nRunning reasoning process for objective:\n{user_input}\n")
         
-        reasoning_objective = user_input
+        objective = user_input
         
-        decision = reason(reasoning_objective)
+        reasoning = reason(objective)
 
-        print("\nDecision:\n" + decision + "\n")
-
+        print("\nDecision:\n" + reasoning + "\n")
+'''
     
 
 
