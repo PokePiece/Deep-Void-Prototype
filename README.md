@@ -56,16 +56,12 @@ Create a `.env` file and include:
 SUPABASE_URL=https://your-supabase-instance.supabase.co
 SUPABASE_KEY=your-supabase-api-key
 TOGETHER_API_KEY=your-together-api-key
-Local CLI Usage
-bash
-Copy
-Edit
+```
+## Local CLI Usage
+```bash
 python deep_void.py
 Enter an objective when prompted:
 
-text
-Copy
-Edit
 Enter an objective (or type 'exit' to quit): Accelerate AGI alignment using embedded neuroscience.
 
 Running reasoning process for objective:
@@ -93,10 +89,10 @@ python-dotenv
 
 Install via pip:
 
+```
 bash
-Copy
-Edit
 pip install -r requirements.txt
+```
 (You must manually maintain requirements.txt, or run pip freeze > requirements.txt.)
 
 ## Notes
@@ -108,4 +104,4 @@ Future architecture should include distinct agents for proposal, argument, refle
 
 ## License
 
-Custom, internal research system. Not licensed for redistribution.
+Custom, internal intelligence system. Not licensed for redistribution.
