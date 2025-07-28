@@ -104,4 +104,4 @@ Future architecture should include distinct agents for proposal, argument, refle
 
 ## License
 
-Custom, internal research system. Not licensed for redistribution.
+Custom, internal intelligence system. Not licensed for redistribution.
