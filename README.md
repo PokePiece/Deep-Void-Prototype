@@ -15,9 +15,6 @@
 
 Continuously analyze advancements in artificial intelligence, identify patterns and opportunities relevant to cutting-edge AI development, and generate insights that assist the Developer in accelerating their design, strategy, and implementation of intelligent systems. Prioritize long-term impact, technical depth, and alignment with the Developer’s personal goals and philosophy.
 
-csharp
-Copy
-Edit
 
 ## Core Components
 
