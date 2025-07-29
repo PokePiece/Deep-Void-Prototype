@@ -59,10 +59,6 @@ def update_knowledge(node_id: str, text: str = None, category: str = None, tags:
             return True
     return False
 
-#add failsafe where when add_ or save_knowledge is called when the array is 
-#empty, to abort the function early (since load_knowledge() must not have been called)
-#best to add this in save_knowledge since it's the final relevant function call
-
 load_knowledge()
 
 save_knowledge()

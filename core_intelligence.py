@@ -7,7 +7,6 @@ from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
 from fastapi import FastAPI, Request
-#from llama_cpp import Llama
 import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
@@ -68,38 +67,34 @@ TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 TOGETHER_API_URL = "https://api.together.ai/v1/chat/completions"
 
 
-#Parse memory for useful knowledge over a certain score based on intent
 def parse_knowledge(intent=None, max_nodes=5):
-    # Retrieve knowledge_nodes from knokwledge knowledge_node list
+
     nodes = []
     for knowl in knowledge:
         if "id" in knowl and "text" in knowl:
             nodes.append(KnowledgeNode(id=knowl["id"], text=knowl["text"]))
 
-
-    # Optionally filter by intent or limit max_nodes if needed (basic example)
     if intent:
         intent_emb = model.encode(intent, convert_to_tensor=True)
         filtered = []
         for node in nodes:
             emb = model.encode(node.text, convert_to_tensor=True)
             score = util.pytorch_cos_sim(intent_emb, emb).item()
-            print(f"[DEBUG] Node ID {node.id} relevance score: {score:.4f}")  # print score here
-            if score > 0.25:  # adjust threshold
+            print(f"[DEBUG] Node ID {node.id} relevance score: {score:.4f}") 
+            if score > 0.25:  
                 filtered.append(node)
         nodes = filtered
     
     return nodes[:max_nodes]
 
-#Of the knowledge that fits the intent, decide how closely it matches the prime directive
+
 def synthesize_usefulness(knowledge_text):
     emb = model.encode(knowledge_text, convert_to_tensor=True)
     usefulness = util.pytorch_cos_sim(prime_directive_emb, emb).item()
     return usefulness
 
 
-#The function that calls the LLM to formulate thought and thinking responses.
-#Added tokens and brevity variables which will allow the think function to give long and concise output
+
 def think(idea, purpose='', useful_knowledge='', tokens:int=1000, brevity:bool=False):
     subject = purpose or 'You are an intelligent, precise organ. Analyze your systems and optimize them for intelligent output and improving patterns of AI Development in general from a broader Developer standpoint: industry, cognition, and human interfacing. Think about ways to provide impact.'
     
@@ -114,7 +109,6 @@ def think(idea, purpose='', useful_knowledge='', tokens:int=1000, brevity:bool=F
         "Content-Type": "application/json"
     }
 
-#Pass prime directive instead of purpose? Or both via concatenation.
     conversation_history = [
         {"role": "system", "content": prime_directive + subject},
         {"role": "user", "content": idea + useful_knowledge + concise_message}
@@ -139,14 +133,10 @@ def think(idea, purpose='', useful_knowledge='', tokens:int=1000, brevity:bool=F
 
     return thought
 
-#Think about the knowledge that matches both the intent and prime directive.
-#Generate a synthesis of how a knowledge node fits with the prime directive.
-#Then, generate a summary synthesis of how all knowledge nodes fit with the prime directive.
 def thought(intent, objective, tokens:int=1000, brevity:bool=False):
     
     idea = f"{intent.strip()}\n\nObjective:\n{objective.strip()}"
     print(f"\n\n--- THOUGHT: ---\n{idea}\n")
-    #e.g.: Idea = "--- THOUGHT: --- Argue in favor of the following objective: Develop AGI with neuroplasticity. "
     
     knowledge = parse_knowledge(idea)
     if not knowledge:
@@ -177,14 +167,12 @@ def thought(intent, objective, tokens:int=1000, brevity:bool=False):
         except Exception as e:
             print(f"[ERROR] Error processing knowledge node ID {knowledge_node.id}: {e}")
 
-    # Now synthesize a session summary (simplified here as concatenation)
     final_knowledge_synthesis = "\n\n".join(relevant_syntheses) if relevant_syntheses else "No useful syntheses found."
     print('[DEBUG] Final knowledge synthesis generated.')
     
     thought_result = think(idea + 'Use the following knowledge to guide your argument. ', final_knowledge_synthesis, tokens, brevity)
     return thought_result
 
-#Reason over thoughts and return them
 def reason(reasoning_objective):
     objective = 'Create AGI with true neuroplasticity for enhanced reasoning in legal domains.'
 
@@ -219,11 +207,13 @@ def action(task):
                   'of the time, assume the user is chatting with you, and select the chat action. Only if the user explicitly commands you to do one '
                   'of the other two things should you return those options. When giving your response for the action, return only your choice like '
                   '"chat", "reason", or "think", with nothing else. Again, without further context or unless explicitly prompted by the user in the '
-                  'prompt simply return "chat". Now, the message from the Developer for you to classify is as follows:')
+                  'prompt simply return "chat". Now, the message from the Developer for you to classify is as follows: ')
     
     action_type = think(task, task_guide)
     print("\nDecision:\n" + action_type + "\n")
     if 'chat' in action_type.lower():
+        response = chat(task)
+    else:
         response = chat(task)
 
     print(response)
@@ -244,27 +234,5 @@ if __name__ == "__main__":
 
 
 
-
-'''
-if __name__ == "__main__":
-    while True:
-        user_input = input("Enter an objective (or type 'exit' to quit): ").strip()
-        if user_input.lower() == "exit":
-            print("Exiting...")
-            break
-        if not user_input:
-            continue
-        print(f"\nRunning reasoning process for objective:\n{user_input}\n")
-        
-        objective = user_input
-        
-        reasoning = reason(objective)
-
-        print("\nDecision:\n" + reasoning + "\n")
-'''
-    
-
-
-    
 
 
