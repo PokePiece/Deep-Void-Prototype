@@ -61,7 +61,7 @@ app.add_middleware(
     
 )
 
-KnowledgeNode = namedtuple("SeaSource", ["id", "text"])
+KnowledgeNode = namedtuple("KnowledgeNode", ["id", "text"])
 
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 TOGETHER_API_URL = "https://api.together.ai/v1/chat/completions"
@@ -87,13 +87,10 @@ def parse_knowledge(intent=None, max_nodes=5):
     
     return nodes[:max_nodes]
 
-
 def synthesize_usefulness(knowledge_text):
     emb = model.encode(knowledge_text, convert_to_tensor=True)
     usefulness = util.pytorch_cos_sim(prime_directive_emb, emb).item()
     return usefulness
-
-
 
 def think(idea, purpose='', useful_knowledge='', tokens:int=1000, brevity:bool=False):
     subject = purpose or 'You are an intelligent, precise organ. Analyze your systems and optimize them for intelligent output and improving patterns of AI Development in general from a broader Developer standpoint: industry, cognition, and human interfacing. Think about ways to provide impact.'
