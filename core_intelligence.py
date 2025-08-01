@@ -26,6 +26,7 @@ from collections import namedtuple
 import time
 import knowledge_base
 from collections import namedtuple
+from intelligence_routes import intelligence_router
 
 load_dotenv() 
 
@@ -34,6 +35,8 @@ SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 
 
 app = FastAPI()
+
+app.include_router(intelligence_router)
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
@@ -52,7 +55,8 @@ prime_directive_emb = model.encode(prime_directive, convert_to_tensor=True)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-    "http://localhost:8000",  
+    "http://localhost:8000",
+    "http://localhost:3001",
     "https://void.dilloncarey.com",
 ],  
     allow_credentials=True,
@@ -167,13 +171,13 @@ def thought(intent, objective, tokens:int=1000, brevity:bool=False):
     final_knowledge_synthesis = "\n\n".join(relevant_syntheses) if relevant_syntheses else "No useful syntheses found."
     print('[DEBUG] Final knowledge synthesis generated.')
     
-    thought_result = think(idea + 'Use the following knowledge to guide your argument. ', final_knowledge_synthesis, tokens, brevity)
+    thought_result = think(idea, 'Use the following knowledge to guide your argument. ', final_knowledge_synthesis, tokens, brevity)
     return thought_result
 
 def reason(reasoning_objective):
     objective = 'Create AGI with true neuroplasticity for enhanced reasoning in legal domains.'
 
-    initial_reason = thought("Develop an initial plan or approach via argument to realize this objective: ", reasoning_objective, 500, True)
+    initial_reason = thought("Develop an initial plan or approach via argument to realize this objective: ", reasoning_objective, tokens=500, brevity=True)
     pro_reason = thought("Argue in favor of this plan/approach: ", initial_reason)
     con_reason = thought("Argue against this plan/approach: ", initial_reason)
 
@@ -185,7 +189,7 @@ def reason(reasoning_objective):
     )
 
     arbiter_reason = thought("Reasoned arbiter analysis of both sides", arbiter_input)
-    final_reasoning = arbiter_reason
+    final_reasoning = 'Final reasoning produced: ' + arbiter_reason
 
     return final_reasoning
 
@@ -210,6 +214,8 @@ def action(task):
     print("\nDecision:\n" + action_type + "\n")
     if 'chat' in action_type.lower():
         response = chat(task)
+    elif 'reason' in action_type.lower():
+        response = reason(task)
     else:
         response = chat(task)
 
@@ -227,7 +233,9 @@ if __name__ == "__main__":
             continue
         print(f"\nRunning processes for command or prompt:\n{user_input}\n")
 
-        action(user_input)
+        response = action(user_input)
+        
+        
 
 
 
